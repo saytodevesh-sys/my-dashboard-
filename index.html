@@ -2818,6 +2818,8 @@ function startShell(){
   navTo('glance');
   // Show Japa FAB on home page
   if(typeof jpSyncVisibility === 'function') setTimeout(jpSyncVisibility, 100);
+  // Fire deep-link event (for notification tap cold-start)
+  window.dispatchEvent(new Event('appUnlocked'));
 }
 
 function showCasualnessAlarmIfNeeded(){
@@ -5931,6 +5933,11 @@ function llhGetPinnedId(){
 }
 function llhSetPinnedId(id){
   try{ if(id) localStorage.setItem(LLH_LS,id); else localStorage.removeItem(LLH_LS); }catch{}
+  // Sync to Firebase so Cloud Function can read the pinned reflection
+  if(fbdb){
+    if(id) fbdb.ref('llh_pinned_id').set(id).catch(()=>{});
+    else   fbdb.ref('llh_pinned_id').remove().catch(()=>{});
+  }
 }
 
 function renderLastHearing(){
@@ -8952,7 +8959,7 @@ function dciAutoCheck(){
 
 const REM_LS      = 'reminders_v1';
 const FCM_TOKEN_LS= 'fcm_token_v1';
-const VAPID_KEY   = 'BCNzafzCEqO7jFantS7oWvvbOncyOddDf9QeFCNUcWUxhgi4nixV_h3JtvJ_PY8lPrCvvvAei-1SJ66eX4JFfGQ';
+const VAPID_KEY   = 'BH2OciHC1M3hr-VwAw1IhzYZm4n9FXpUHGU79uwvR-2KyK7DZSOtJXSctXUMLk7X7Lq2A9T6SMQ6XOVcp8kHDIA';
 const FCM_SENDER  = '44383620869';
 
 let remInited = false;
@@ -8980,13 +8987,23 @@ const messaging = firebase.messaging();
 messaging.onBackgroundMessage(function(payload){
   const title = payload.notification?.title || payload.data?.title || 'Reminder';
   const body  = payload.notification?.body  || payload.data?.body  || '';
-  return self.registration.showNotification(title,{body,icon:'/favicon.ico',vibrate:[200,100,200]});
+  const reflId = payload.data?.reflId || '';
+  return self.registration.showNotification(title,{body,icon:'/favicon.ico',vibrate:[200,100,200],data:{reflId}});
 });
 self.addEventListener('notificationclick',function(event){
   event.notification.close();
+  const data = event.notification.data || {};
+  const reflId = data.reflId || (event.notification.data && event.notification.data.reflId) || '';
+  const targetUrl = reflId ? ('/?openRefl=' + reflId) : '/';
   event.waitUntil(clients.matchAll({type:'window',includeUncontrolled:true}).then(function(cl){
-    for(const c of cl){ if(c.url&&'focus' in c) return c.focus(); }
-    if(clients.openWindow) return clients.openWindow('/');
+    for(const c of cl){
+      if('focus' in c){
+        c.focus();
+        if(reflId) c.postMessage({type:'OPEN_REFL',reflId:reflId});
+        return;
+      }
+    }
+    if(clients.openWindow) return clients.openWindow(targetUrl);
   }));
 });`;
 
@@ -9312,6 +9329,42 @@ function initReminders(){
 const _origNavTo = window.navTo || function(){};
 // We override navTo after it's defined
 document.addEventListener('DOMContentLoaded', ()=>{}, false);
+
+// ── Handle notification tap deep-link (app already open) ──
+if('serviceWorker' in navigator){
+  navigator.serviceWorker.addEventListener('message', function(event){
+    if(event.data && event.data.type === 'OPEN_REFL' && event.data.reflId){
+      const reflId = event.data.reflId;
+      // Wait for HR data to be ready, then navigate
+      function tryNavigate(attempts){
+        hrLoad();
+        const r = (HR.reflections||[]).find(x => x.id === reflId);
+        if(r){ hrNavigateToReflection(r); }
+        else if(attempts > 0){ setTimeout(()=>tryNavigate(attempts-1), 600); }
+        else { navTo('hearing'); }
+      }
+      tryNavigate(5);
+    }
+  });
+  // Handle cold-start deep-link via URL param
+  const _urlParams = new URLSearchParams(window.location.search);
+  const _openRefl  = _urlParams.get('openRefl');
+  if(_openRefl){
+    window.addEventListener('appUnlocked', function onUnlock(){
+      window.removeEventListener('appUnlocked', onUnlock);
+      setTimeout(()=>{
+        hrLoad();
+        function tryNav(attempts){
+          const r = (HR.reflections||[]).find(x => x.id === _openRefl);
+          if(r){ hrNavigateToReflection(r); }
+          else if(attempts > 0){ setTimeout(()=>tryNav(attempts-1), 700); }
+          else { navTo('hearing'); }
+        }
+        tryNav(6);
+      }, 400);
+    });
+  }
+}
 
 // Poll until navTo exists, then wrap it
 const remNavPoll = setInterval(()=>{
