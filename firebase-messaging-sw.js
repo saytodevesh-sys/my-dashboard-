@@ -1,6 +1,3 @@
-// firebase-messaging-sw.js
-// Deploy this file to the ROOT of your Netlify site (same level as index.html)
-
 importScripts('https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js');
 importScripts('https://www.gstatic.com/firebasejs/10.12.0/firebase-messaging-compat.js');
 
@@ -16,33 +13,49 @@ firebase.initializeApp({
 
 const messaging = firebase.messaging();
 
-// Handle background notifications (when app/browser tab is not in focus)
+// ── Background message handler ───────────────────────────────────────────────
+// Called when a push arrives and the app is in the background / closed.
+// We manually show the notification so we can attach the reflId in data.
 messaging.onBackgroundMessage(function(payload) {
-  console.log('[SW] Background message received:', payload);
-
-  const title = payload.notification?.title || payload.data?.title || 'Reminder';
-  const body  = payload.notification?.body  || payload.data?.body  || '';
-  const icon  = payload.notification?.icon  || '/favicon.ico';
+  const title  = payload.notification?.title || payload.data?.title || 'Reminder';
+  const body   = payload.notification?.body  || payload.data?.body  || '';
+  const reflId = payload.data?.reflId || '';
 
   return self.registration.showNotification(title, {
-    body,
-    icon,
-    badge: icon,
-    data: payload.data || {},
+    body:    body,
+    icon:    '/favicon.ico',
+    badge:   '/favicon.ico',
     vibrate: [200, 100, 200],
-    requireInteraction: false,
+    data:    { reflId: reflId }   // ← carries reflId through to notificationclick
   });
 });
 
-// Handle notification click — focus or open the app
+// ── Notification tap handler ─────────────────────────────────────────────────
+// When user taps the notification:
+//   • If app window is already open  → focus it + postMessage to navigate
+//   • If app is closed               → open /?openRefl=<id> so app can deep-link
 self.addEventListener('notificationclick', function(event) {
   event.notification.close();
+
+  const reflId    = event.notification.data?.reflId || '';
+  const targetUrl = reflId ? ('/?openRefl=' + encodeURIComponent(reflId)) : '/';
+
   event.waitUntil(
     clients.matchAll({ type: 'window', includeUncontrolled: true }).then(function(clientList) {
+      // App is already open in some tab — focus it and tell it to navigate
       for (const client of clientList) {
-        if (client.url && 'focus' in client) return client.focus();
+        if ('focus' in client) {
+          client.focus();
+          if (reflId) {
+            client.postMessage({ type: 'OPEN_REFL', reflId: reflId });
+          }
+          return;
+        }
       }
-      if (clients.openWindow) return clients.openWindow('/');
+      // App is closed — open it with the deep-link URL
+      if (clients.openWindow) {
+        return clients.openWindow(targetUrl);
+      }
     })
   );
 });
