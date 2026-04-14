@@ -2723,8 +2723,7 @@ const FB = {
   projectId:"daily-self-evaluation-fcfba",
   storageBucket:"daily-self-evaluation-fcfba.firebasestorage.app",
   messagingSenderId:"44383620869",
-  appId:"1:44383620869:web:966935db604ddad5abf16c",
-  measurementId:"G-LWWBF35W1L"
+  appId:"1:44383620869:web:966935db604ddad5abf16c"
 };
 const PWLS = 'hub_pw';
 
@@ -2818,8 +2817,6 @@ function startShell(){
   navTo('glance');
   // Show Japa FAB on home page
   if(typeof jpSyncVisibility === 'function') setTimeout(jpSyncVisibility, 100);
-  // Fire deep-link event (for notification tap cold-start)
-  window.dispatchEvent(new Event('appUnlocked'));
 }
 
 function showCasualnessAlarmIfNeeded(){
@@ -5933,11 +5930,6 @@ function llhGetPinnedId(){
 }
 function llhSetPinnedId(id){
   try{ if(id) localStorage.setItem(LLH_LS,id); else localStorage.removeItem(LLH_LS); }catch{}
-  // Sync to Firebase so Cloud Function can read the pinned reflection
-  if(fbdb){
-    if(id) fbdb.ref('llh_pinned_id').set(id).catch(()=>{});
-    else   fbdb.ref('llh_pinned_id').remove().catch(()=>{});
-  }
 }
 
 function renderLastHearing(){
@@ -8987,23 +8979,13 @@ const messaging = firebase.messaging();
 messaging.onBackgroundMessage(function(payload){
   const title = payload.notification?.title || payload.data?.title || 'Reminder';
   const body  = payload.notification?.body  || payload.data?.body  || '';
-  const reflId = payload.data?.reflId || '';
-  return self.registration.showNotification(title,{body,icon:'/favicon.ico',vibrate:[200,100,200],data:{reflId}});
+  return self.registration.showNotification(title,{body,icon:'/favicon.ico',vibrate:[200,100,200]});
 });
 self.addEventListener('notificationclick',function(event){
   event.notification.close();
-  const data = event.notification.data || {};
-  const reflId = data.reflId || (event.notification.data && event.notification.data.reflId) || '';
-  const targetUrl = reflId ? ('/?openRefl=' + reflId) : '/';
   event.waitUntil(clients.matchAll({type:'window',includeUncontrolled:true}).then(function(cl){
-    for(const c of cl){
-      if('focus' in c){
-        c.focus();
-        if(reflId) c.postMessage({type:'OPEN_REFL',reflId:reflId});
-        return;
-      }
-    }
-    if(clients.openWindow) return clients.openWindow(targetUrl);
+    for(const c of cl){ if(c.url&&'focus' in c) return c.focus(); }
+    if(clients.openWindow) return clients.openWindow('/');
   }));
 });`;
 
@@ -9097,39 +9079,29 @@ async function getFCMToken(swReg){
   const dot = document.getElementById('rem-fcm-dot');
   const lbl = document.getElementById('rem-fcm-lbl');
 
-  // Wait for Firebase app to be ready (loaded async by initFirebase)
+  // Load Firebase Messaging compat SDK dynamically
   if(typeof firebase === 'undefined' || !firebase.apps || !firebase.apps.length){
     dot.className='rem-dot rem-dot-pending';
     lbl.textContent='Waiting for Firebase…';
-    const ready = await new Promise(resolve => {
+    // Wait for Firebase to be ready (it's loaded by initFirebase)
+    await new Promise(resolve => {
       const check = setInterval(()=>{
         if(typeof firebase !== 'undefined' && firebase.apps && firebase.apps.length){
-          clearInterval(check); resolve(true);
+          clearInterval(check); resolve();
         }
       }, 300);
-      setTimeout(()=>{ clearInterval(check); resolve(false); }, 10000);
+      setTimeout(()=>{ clearInterval(check); resolve(); }, 8000); // timeout 8s
     });
-    if(!ready){
-      dot.className='rem-dot rem-dot-err';
-      lbl.textContent='Firebase did not load — check network';
-      return;
-    }
   }
 
   // Load Firebase Messaging compat script if not already loaded
   if(typeof firebase.messaging === 'undefined'){
-    try{
-      await new Promise((resolve, reject)=>{
-        const s = document.createElement('script');
-        s.src = 'https://www.gstatic.com/firebasejs/10.12.0/firebase-messaging-compat.js';
-        s.onload = resolve; s.onerror = reject;
-        document.head.appendChild(s);
-      });
-    } catch(e){
-      dot.className='rem-dot rem-dot-err';
-      lbl.textContent='Could not load messaging SDK';
-      return;
-    }
+    await new Promise((resolve, reject)=>{
+      const s = document.createElement('script');
+      s.src = 'https://www.gstatic.com/firebasejs/10.12.0/firebase-messaging-compat.js';
+      s.onload = resolve; s.onerror = reject;
+      document.head.appendChild(s);
+    });
   }
 
   try{
@@ -9142,28 +9114,18 @@ async function getFCMToken(swReg){
       localStorage.setItem(FCM_TOKEN_LS, token);
       dot.className='rem-dot rem-dot-ok';
       lbl.textContent='Push notifications active ✓';
-      // Save token to Firebase so Cloud Function can reach this device
+      // Save token to Firestore/Realtime DB so Cloud Function can reach this device
       if(fbdb){
         fbdb.ref('fcm_tokens/dashboard').set({ token, updatedAt: Date.now() });
       }
     } else {
       dot.className='rem-dot rem-dot-err';
-      lbl.textContent='Could not get push token (null)';
+      lbl.textContent='Could not get push token';
     }
   } catch(e){
-    console.error('FCM token error:', e);
+    console.warn('FCM token error:', e);
     dot.className='rem-dot rem-dot-err';
-    // Show actual error for diagnosis
-    const msg = e.message || e.code || String(e);
-    if(msg.includes('vapid') || msg.includes('VAPID') || msg.includes('applicationServerKey')){
-      lbl.textContent='VAPID key mismatch — check Firebase Console';
-    } else if(msg.includes('messaging/permission-blocked')){
-      lbl.textContent='Notifications blocked in browser settings';
-    } else if(msg.includes('messaging/unsupported-browser')){
-      lbl.textContent='Push not supported in this browser';
-    } else {
-      lbl.textContent='Push error: ' + msg.slice(0, 60);
-    }
+    lbl.textContent='Push setup unavailable';
   }
 }
 
@@ -9330,42 +9292,6 @@ const _origNavTo = window.navTo || function(){};
 // We override navTo after it's defined
 document.addEventListener('DOMContentLoaded', ()=>{}, false);
 
-// ── Handle notification tap deep-link (app already open) ──
-if('serviceWorker' in navigator){
-  navigator.serviceWorker.addEventListener('message', function(event){
-    if(event.data && event.data.type === 'OPEN_REFL' && event.data.reflId){
-      const reflId = event.data.reflId;
-      // Wait for HR data to be ready, then navigate
-      function tryNavigate(attempts){
-        hrLoad();
-        const r = (HR.reflections||[]).find(x => x.id === reflId);
-        if(r){ hrNavigateToReflection(r); }
-        else if(attempts > 0){ setTimeout(()=>tryNavigate(attempts-1), 600); }
-        else { navTo('hearing'); }
-      }
-      tryNavigate(5);
-    }
-  });
-  // Handle cold-start deep-link via URL param
-  const _urlParams = new URLSearchParams(window.location.search);
-  const _openRefl  = _urlParams.get('openRefl');
-  if(_openRefl){
-    window.addEventListener('appUnlocked', function onUnlock(){
-      window.removeEventListener('appUnlocked', onUnlock);
-      setTimeout(()=>{
-        hrLoad();
-        function tryNav(attempts){
-          const r = (HR.reflections||[]).find(x => x.id === _openRefl);
-          if(r){ hrNavigateToReflection(r); }
-          else if(attempts > 0){ setTimeout(()=>tryNav(attempts-1), 700); }
-          else { navTo('hearing'); }
-        }
-        tryNav(6);
-      }, 400);
-    });
-  }
-}
-
 // Poll until navTo exists, then wrap it
 const remNavPoll = setInterval(()=>{
   if(typeof navTo === 'function'){
@@ -9392,6 +9318,46 @@ const glanceInit = setInterval(()=>{
   }
 }, 400);
 
+})();
+
+// ── Deep-link handler: ?openRefl=REFLECTION_ID ───────────────────────────────
+// When the app is opened from a Nityam push notification tap, this reads the
+// reflection ID from the URL and navigates directly to that reflection.
+(function(){
+  const params = new URLSearchParams(window.location.search);
+  const reflId = params.get('openRefl');
+  if(!reflId) return;
+
+  // Wait until app is unlocked and HR data is loaded, then navigate
+  const pollDeeplink = setInterval(()=>{
+    const shell = document.getElementById('shell');
+    if(!shell || shell.style.display === 'none') return; // not logged in yet
+    if(typeof HR === 'undefined' || !HR.reflections) return; // data not loaded
+
+    clearInterval(pollDeeplink);
+
+    const refl = HR.reflections.find(r => r.id === reflId);
+    if(refl){
+      hrNavigateToReflection(refl);
+    } else {
+      // Reflection not in localStorage yet — wait for Firebase sync
+      const pollFB = setInterval(()=>{
+        if(typeof HR !== 'undefined' && HR.reflections){
+          const r2 = HR.reflections.find(r => r.id === reflId);
+          if(r2){
+            clearInterval(pollFB);
+            hrNavigateToReflection(r2);
+          }
+        }
+      }, 500);
+      // Give up after 10 seconds and just open hearing page
+      setTimeout(()=>{ clearInterval(pollFB); navTo('hearing'); }, 10000);
+    }
+
+    // Clean up URL without reloading page
+    const clean = window.location.pathname;
+    window.history.replaceState({}, document.title, clean);
+  }, 300);
 })();
 
 </script>
