@@ -1,3 +1,6 @@
+// firebase-messaging-sw.js
+// Deploy this file to the ROOT of your Netlify site (same level as index.html)
+
 importScripts('https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js');
 importScripts('https://www.gstatic.com/firebasejs/10.12.0/firebase-messaging-compat.js');
 
@@ -13,49 +16,43 @@ firebase.initializeApp({
 
 const messaging = firebase.messaging();
 
-// ── Background message handler ───────────────────────────────────────────────
-// Called when a push arrives and the app is in the background / closed.
-// We manually show the notification so we can attach the reflId in data.
+// Handle background notifications (when app/browser tab is not in focus)
 messaging.onBackgroundMessage(function(payload) {
-  const title  = payload.notification?.title || payload.data?.title || 'Reminder';
-  const body   = payload.notification?.body  || payload.data?.body  || '';
-  const reflId = payload.data?.reflId || '';
+  console.log('[SW] Background message received:', payload);
+
+  const title = payload.notification?.title || payload.data?.title || 'Reminder';
+  const body  = payload.notification?.body  || payload.data?.body  || '';
+  const icon  = payload.notification?.icon  || '/favicon.ico';
 
   return self.registration.showNotification(title, {
-    body:    body,
-    icon:    '/favicon.ico',
-    badge:   '/favicon.ico',
+    body,
+    icon,
+    badge: icon,
+    data: payload.data || {},
     vibrate: [200, 100, 200],
-    data:    { reflId: reflId }   // ← carries reflId through to notificationclick
+    requireInteraction: false,
   });
 });
 
-// ── Notification tap handler ─────────────────────────────────────────────────
-// When user taps the notification:
-//   • If app window is already open  → focus it + postMessage to navigate
-//   • If app is closed               → open /?openRefl=<id> so app can deep-link
+// Handle notification click — open deeplink if present, else focus/open app
 self.addEventListener('notificationclick', function(event) {
   event.notification.close();
 
-  const reflId    = event.notification.data?.reflId || '';
-  const targetUrl = reflId ? ('/?openRefl=' + encodeURIComponent(reflId)) : '/';
+  // If notification carries a deeplink (e.g. /?openRefl=rem_xxx), open it
+  const data    = event.notification.data || {};
+  const deepUrl = data.deeplink || '/';
 
   event.waitUntil(
     clients.matchAll({ type: 'window', includeUncontrolled: true }).then(function(clientList) {
-      // App is already open in some tab — focus it and tell it to navigate
+      // If app is already open, navigate it to the deeplink
       for (const client of clientList) {
-        if ('focus' in client) {
-          client.focus();
-          if (reflId) {
-            client.postMessage({ type: 'OPEN_REFL', reflId: reflId });
-          }
-          return;
+        if ('navigate' in client && 'focus' in client) {
+          return client.navigate(deepUrl).then(() => client.focus());
         }
+        if ('focus' in client) return client.focus();
       }
-      // App is closed — open it with the deep-link URL
-      if (clients.openWindow) {
-        return clients.openWindow(targetUrl);
-      }
+      // App not open — open a new window with the deeplink
+      if (clients.openWindow) return clients.openWindow(deepUrl);
     })
   );
 });
