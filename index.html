@@ -1046,6 +1046,54 @@ tr:last-child td{border-bottom:none}
 .cas-alarm-foot{font-size:11px;color:var(--muted);margin-bottom:18px;line-height:1.6;text-align:center}
 .cas-alarm-btn{width:100%;background:var(--acc);color:#fff;border:none;border-radius:11px;padding:13px;font-family:'Syne',sans-serif;font-size:14px;font-weight:800;cursor:pointer;transition:opacity .15s}
 .cas-alarm-btn:hover{opacity:.88}
+.con-conscious-btn{width:100%;background:var(--done);color:#fff;border:none;border-radius:11px;padding:12px;font-family:'Syne',sans-serif;font-size:13px;font-weight:800;cursor:pointer;transition:opacity .15s;margin-bottom:10px}
+.con-conscious-btn:hover{opacity:.88}
+.con-conscious-btn:disabled{opacity:.5;cursor:not-allowed}
+.con-card{background:var(--sur);border:1.5px solid var(--bdr);border-radius:14px;padding:18px 20px;margin-bottom:18px}
+.con-card-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;flex-wrap:wrap;gap:8px}
+.con-card-title{font-family:'Syne',sans-serif;font-size:13px;font-weight:800;color:var(--acc);letter-spacing:1px;text-transform:uppercase}
+.con-score{font-family:'Syne',sans-serif;font-size:22px;font-weight:800;color:var(--acc)}
+.con-score span{font-size:12px;color:var(--muted);font-weight:400;margin-left:4px}
+.con-prog{height:6px;background:var(--bdr);border-radius:4px;overflow:hidden;margin-bottom:14px}
+.con-prog-fill{height:100%;border-radius:4px;background:var(--acc);transition:width .4s}
+.con-prog-fill.high{background:var(--done)}
+.con-grid{display:grid;grid-template-columns:repeat(8,1fr);gap:5px;margin-bottom:10px}
+.con-slot{border-radius:7px;padding:5px 3px;text-align:center;font-size:9px;font-family:'DM Mono',monospace;cursor:pointer;border:1.5px solid var(--bdr);background:var(--sur2);color:var(--muted);transition:all .15s;line-height:1.3;user-select:none}
+.con-slot.marked{background:rgba(46,125,94,.18);border-color:var(--done);color:var(--done);font-weight:700}
+.con-slot.current{border-color:var(--acc);border-width:2px}
+.con-slot.future{opacity:.35;cursor:default;pointer-events:none}
+.con-slot:hover:not(.marked):not(.future){border-color:var(--acc);color:var(--acc)}
+.con-history-btn{background:none;border:1.5px solid var(--bdr);border-radius:8px;padding:6px 14px;font-family:'DM Mono',monospace;font-size:11px;color:var(--muted);cursor:pointer;transition:all .15s}
+.con-history-btn:hover{border-color:var(--acc);color:var(--acc)}
+.con-history-panel{margin-top:12px;display:none}
+.con-history-panel.open{display:block}
+.con-day-row{display:flex;align-items:center;gap:10px;padding:7px 0;border-bottom:1px solid var(--bdr);flex-wrap:wrap}
+.con-day-row:last-child{border-bottom:none}
+.con-day-label{font-size:11px;color:var(--muted);min-width:90px;flex-shrink:0}
+.con-day-score{font-family:'Syne',sans-serif;font-size:12px;font-weight:800;color:var(--acc);min-width:60px;flex-shrink:0}
+.con-day-bar-wrap{flex:1;min-width:80px;height:6px;background:var(--bdr);border-radius:3px;overflow:hidden}
+.con-day-bar-fill{height:100%;border-radius:3px;background:var(--acc);transition:width .3s}
+.con-day-bar-fill.high{background:var(--done)}
+/* Quick ledger popup */
+.qld-overlay{position:fixed;inset:0;z-index:3500;display:flex;align-items:center;justify-content:center;background:rgba(58,36,24,.55);backdrop-filter:blur(4px)}
+.qld-card{background:var(--sur);border:2px solid var(--bdr);border-radius:18px;padding:26px 24px 22px;max-width:360px;width:92%;box-shadow:0 12px 48px rgba(58,36,24,.22)}
+.qld-title{font-family:'Syne',sans-serif;font-size:15px;font-weight:800;margin-bottom:18px;text-align:center;color:var(--acc)}
+.qld-type-row{display:flex;gap:8px;margin-bottom:14px}
+.qld-type-btn{flex:1;padding:9px;border-radius:9px;border:1.5px solid var(--bdr);font-family:'Syne',sans-serif;font-size:12px;font-weight:700;cursor:pointer;background:var(--sur2);color:var(--muted);transition:all .15s}
+.qld-type-btn.on{background:var(--acc);color:#fff;border-color:var(--acc)}
+.qld-type-btn.on.income{background:var(--done);border-color:var(--done)}
+.qld-mode-row{display:flex;gap:8px;margin-bottom:14px}
+.qld-mode-btn{flex:1;padding:8px;border-radius:9px;border:1.5px solid var(--bdr);font-family:'DM Mono',monospace;font-size:11px;cursor:pointer;background:var(--sur2);color:var(--muted);transition:all .15s;text-align:center}
+.qld-mode-btn.on{background:rgba(224,90,43,.12);border-color:var(--acc);color:var(--acc);font-weight:700}
+.qld-inp{width:100%;background:var(--sur2);border:1.5px solid var(--bdr);border-radius:9px;padding:10px 13px;font-family:'DM Mono',monospace;font-size:14px;color:var(--txt);outline:none;transition:border-color .15s;margin-bottom:10px;box-sizing:border-box}
+.qld-inp:focus{border-color:var(--acc)}
+.qld-sel{width:100%;background:var(--sur2);border:1.5px solid var(--bdr);border-radius:9px;padding:10px 13px;font-family:'DM Mono',monospace;font-size:12px;color:var(--txt);outline:none;margin-bottom:10px;box-sizing:border-box}
+.qld-date{width:100%;background:var(--sur2);border:1.5px solid var(--bdr);border-radius:9px;padding:9px 13px;font-family:'DM Mono',monospace;font-size:12px;color:var(--txt);outline:none;margin-bottom:14px;box-sizing:border-box}
+.qld-save-btn{width:100%;background:var(--acc);color:#fff;border:none;border-radius:11px;padding:12px;font-family:'Syne',sans-serif;font-size:13px;font-weight:800;cursor:pointer;transition:opacity .15s;margin-bottom:8px}
+.qld-save-btn:hover{opacity:.88}
+.qld-cancel-btn{width:100%;background:none;border:1.5px solid var(--bdr);border-radius:11px;padding:10px;font-family:'DM Mono',monospace;font-size:12px;color:var(--muted);cursor:pointer;transition:all .15s}
+.qld-cancel-btn:hover{border-color:var(--bad);color:var(--bad)}
+.qld-err{font-size:11px;color:var(--bad);text-align:center;min-height:16px;margin-bottom:6px}
 
 /* ── MENTAL BREAK ALARM ── */
 .mb-alarm-modal{position:fixed;inset:0;z-index:3000;display:flex;align-items:center;justify-content:center;background:rgba(58,36,24,.65);backdrop-filter:blur(5px)}
@@ -1624,6 +1672,20 @@ tr:last-child td{border-bottom:none}
             <div class="glance-score-prog"><div class="glance-score-fill" id="glance-score-fill" style="width:0%"></div></div>
           </div>
           <div class="glance-pending-badge" id="glance-pending-badge" style="display:none"></div>
+        </div>
+        <!-- Consciousness tracker card -->
+        <div class="con-card" id="con-card">
+          <div class="con-card-header">
+            <div class="con-card-title">🙏 Guru &amp; Krishna Consciousness</div>
+            <div class="con-score"><span id="con-score-num">0</span>/24<span id="con-score-pct"> (0%)</span></div>
+          </div>
+          <div class="con-prog"><div class="con-prog-fill" id="con-prog-fill" style="width:0%"></div></div>
+          <div class="con-grid" id="con-grid"></div>
+          <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px">
+            <div style="font-size:10px;color:var(--muted)">Tap any hour to mark consciousness</div>
+            <button class="con-history-btn" id="con-history-btn">📅 Past 30 days</button>
+          </div>
+          <div class="con-history-panel" id="con-history-panel"></div>
         </div>
         <!-- Slot cards rendered by JS -->
         <div id="glance-slots"></div>
@@ -2855,9 +2917,9 @@ function showCasualnessAlarmIfNeeded(){
     return { ...p, missedCount };
   }).filter(p => p.missedCount > 0);
 
-  // Only show popup if CRITICAL (5+ areas casual) or at least 1 area missed all 3 days
+  // Show casualness popup if alarming, else show thank-you popup
   const criticalItems = alarming.filter(p => p.missedCount === 3);
-  if(alarming.length < 5 && criticalItems.length === 0) return;
+  const isCasual = alarming.length >= 5 || criticalItems.length > 0;
 
   const severity = alarming.length >= 5 ? 'CRITICAL' : 'SERIOUS';
 
@@ -2866,24 +2928,38 @@ function showCasualnessAlarmIfNeeded(){
   modal.className = 'cas-alarm-modal';
   modal.id = 'cas-alarm-modal';
 
-  // Decide which items to show: all 3-day misses first, then remaining alarming (max 7)
-  const showItems = [...criticalItems, ...alarming.filter(p=>p.missedCount<3)].slice(0,7);
-
-  const listHTML = showItems.map(p=>
-    '<li>'+
-      '<span class="cai">'+p.icon+'</span>'+
-      '<span>'+p.lbl+'</span>'+
-      '<span class="cam">'+p.missedCount+'/3 days missed</span>'+
-    '</li>'
-  ).join('');
-
-  modal.innerHTML =
-    '<div class="cas-alarm-card">'+
+  let bodyHTML = '';
+  if(isCasual){
+    const showItems = [...criticalItems, ...alarming.filter(p=>p.missedCount<3)].slice(0,7);
+    const listHTML = showItems.map(p=>
+      '<li>'+
+        '<span class="cai">'+p.icon+'</span>'+
+        '<span>'+p.lbl+'</span>'+
+        '<span class="cam">'+p.missedCount+'/3 days missed</span>'+
+      '</li>'
+    ).join('');
+    bodyHTML =
       '<div class="cas-alarm-icon">🚨</div>'+
       '<div style="text-align:center"><span class="cas-alarm-badge">'+severity+'</span></div>'+
       '<div class="cas-alarm-title" style="text-align:center">Casualness Detected</div>'+
       '<ul class="cas-alarm-list">'+listHTML+'</ul>'+
-      '<div class="cas-alarm-foot">'+alarming.length+' critical dut'+(alarming.length===1?'y':'ies')+' missed in the last 3 days.<br>Immediate correction needed — Guru &amp; Krishna are watching.</div>'+
+      '<div class="cas-alarm-foot">'+alarming.length+' critical dut'+(alarming.length===1?'y':'ies')+' missed in the last 3 days.<br>Immediate correction needed — Guru &amp; Krishna are watching.</div>';
+  } else {
+    bodyHTML =
+      '<div class="cas-alarm-icon">🙏</div>'+
+      '<div class="cas-alarm-title" style="text-align:center;color:var(--done)">Thank you for not being Casual</div>'+
+      '<div class="cas-alarm-foot" style="text-align:center">You are maintaining your sadhana well.<br>Keep going with full consciousness!</div>';
+  }
+
+  modal.innerHTML =
+    '<div class="cas-alarm-card">'+
+      '<div style="display:flex;justify-content:flex-end;margin-bottom:6px">'+
+        '<button id="cas-qld-btn" title="Quick Ledger Entry" class="con-history-btn" style="margin-bottom:0">'+
+          '💰 Add Ledger Entry'+
+        '</button>'+
+      '</div>'+
+      bodyHTML+
+      '<button class="con-conscious-btn" id="cas-con-btn">🙏 I am conscious of Guru &amp; Krishna</button>'+
       '<button class="cas-alarm-btn" id="cas-alarm-continue">Continue →</button>'+
     '</div>';
 
@@ -2892,6 +2968,18 @@ function showCasualnessAlarmIfNeeded(){
   document.getElementById('cas-alarm-continue').addEventListener('click', ()=>{
     modal.remove();
     navTo('home');
+  });
+
+  // Consciousness button -- mark current hour and close popup
+  document.getElementById('cas-con-btn').addEventListener('click', ()=>{
+    if(typeof conMarkCurrentHour === 'function') conMarkCurrentHour();
+    modal.remove();
+    navTo('glance');
+  });
+
+  // Quick ledger button -- open quick ledger popup (keep casualness popup open underneath)
+  document.getElementById('cas-qld-btn').addEventListener('click', ()=>{
+    openQuickLedger();
   });
 }
 
@@ -9320,45 +9408,318 @@ const glanceInit = setInterval(()=>{
 
 })();
 
-// ── Deep-link handler: ?openRefl=REFLECTION_ID ───────────────────────────────
-// When the app is opened from a Nityam push notification tap, this reads the
-// reflection ID from the URL and navigates directly to that reflection.
+
+// \u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550
+// GURU & KRISHNA CONSCIOUSNESS TRACKER
+// \u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550
 (function(){
-  const params = new URLSearchParams(window.location.search);
-  const reflId = params.get('openRefl');
-  if(!reflId) return;
 
-  // Wait until app is unlocked and HR data is loaded, then navigate
-  const pollDeeplink = setInterval(()=>{
-    const shell = document.getElementById('shell');
-    if(!shell || shell.style.display === 'none') return; // not logged in yet
-    if(typeof HR === 'undefined' || !HR.reflections) return; // data not loaded
+const CON_LS  = 'gk_consciousness_v1';
+const CON_FB  = 'gk_consciousness';
 
-    clearInterval(pollDeeplink);
+// \u2500\u2500 Helpers \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500
+function conToday(){ return new Date().toISOString().split('T')[0]; }
+function conCurrentHour(){ return new Date().getHours(); }
 
-    const refl = HR.reflections.find(r => r.id === reflId);
-    if(refl){
-      hrNavigateToReflection(refl);
-    } else {
-      // Reflection not in localStorage yet — wait for Firebase sync
-      const pollFB = setInterval(()=>{
-        if(typeof HR !== 'undefined' && HR.reflections){
-          const r2 = HR.reflections.find(r => r.id === reflId);
-          if(r2){
-            clearInterval(pollFB);
-            hrNavigateToReflection(r2);
-          }
+function conLoad(){
+  try{ return JSON.parse(localStorage.getItem(CON_LS)||'{}'); }catch{ return {}; }
+}
+function conSave(data){
+  try{ localStorage.setItem(CON_LS, JSON.stringify(data)); }catch{}
+}
+function conSyncFB(data){
+  if(typeof fbdb === 'undefined' || !fbdb) return;
+  fbdb.ref(CON_FB).set(data);
+}
+
+// data structure: { "2026-04-15": [3, 7, 14, ...], ... }
+// each date maps to an array of hour numbers that were marked
+
+function conGetDay(date){
+  const data = conLoad();
+  return data[date] || [];
+}
+
+function conMarkHour(date, hour){
+  const data = conLoad();
+  if(!data[date]) data[date] = [];
+  if(!data[date].includes(hour)){
+    data[date].push(hour);
+    data[date].sort((a,b)=>a-b);
+  }
+  conSave(data);
+  conSyncFB(data);
+}
+
+function conUnmarkHour(date, hour){
+  const data = conLoad();
+  if(!data[date]) return;
+  data[date] = data[date].filter(h => h !== hour);
+  conSave(data);
+  conSyncFB(data);
+}
+
+// \u2500\u2500 Render today's grid \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500
+function conRenderGrid(){
+  const grid    = document.getElementById('con-grid');
+  const scoreEl = document.getElementById('con-score-num');
+  const pctEl   = document.getElementById('con-score-pct');
+  const fillEl  = document.getElementById('con-prog-fill');
+  if(!grid) return;
+
+  const today   = conToday();
+  const marked  = conGetDay(today);
+  const curHour = conCurrentHour();
+  const score   = marked.length;
+  const pct     = Math.round((score / 24) * 100);
+
+  if(scoreEl) scoreEl.textContent = score;
+  if(pctEl)   pctEl.textContent   = ' (' + pct + '%)';
+  if(fillEl){
+    fillEl.style.width = pct + '%';
+    fillEl.className   = 'con-prog-fill' + (pct >= 70 ? ' high' : '');
+  }
+
+  grid.innerHTML = '';
+  for(let h = 0; h < 24; h++){
+    const isMarked  = marked.includes(h);
+    const isCurrent = h === curHour;
+    const isFuture  = h > curHour;
+
+    const slot = document.createElement('div');
+    slot.className = 'con-slot'
+      + (isMarked  ? ' marked'  : '')
+      + (isCurrent ? ' current' : '')
+      + (isFuture  ? ' future'  : '');
+
+    const label = String(h).padStart(2,'0') + ':00';
+    slot.textContent = label;
+    slot.title = label;
+
+    if(!isFuture){
+      slot.addEventListener('click', ()=>{
+        if(isMarked){
+          conUnmarkHour(today, h);
+        } else {
+          conMarkHour(today, h);
         }
-      }, 500);
-      // Give up after 10 seconds and just open hearing page
-      setTimeout(()=>{ clearInterval(pollFB); navTo('hearing'); }, 10000);
+        conRenderGrid();
+        conRenderHistory();
+      });
     }
+    grid.appendChild(slot);
+  }
+}
 
-    // Clean up URL without reloading page
-    const clean = window.location.pathname;
-    window.history.replaceState({}, document.title, clean);
-  }, 300);
+// \u2500\u2500 Render 30-day history \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500
+function conRenderHistory(){
+  const panel = document.getElementById('con-history-panel');
+  if(!panel || !panel.classList.contains('open')) return;
+
+  const data  = conLoad();
+  const rows  = [];
+
+  for(let i = 0; i < 30; i++){
+    const d   = new Date();
+    d.setDate(d.getDate() - i);
+    const key = d.toISOString().split('T')[0];
+    const hrs = data[key] || [];
+    // For today only count up to current hour as total possible
+    const possible = (i === 0) ? (conCurrentHour() + 1) : 24;
+    const score    = hrs.length;
+    const pct      = possible > 0 ? Math.round((score / possible) * 100) : 0;
+    const label    = i === 0 ? 'Today' : d.toLocaleDateString('en-IN',{day:'numeric',month:'short'});
+    rows.push({ key, label, score, possible, pct });
+  }
+
+  panel.innerHTML = rows.map(r =>
+    '<div class="con-day-row">' +
+      '<div class="con-day-label">' + r.label + '</div>' +
+      '<div class="con-day-score">' + r.score + '/' + r.possible + '</div>' +
+      '<div class="con-day-bar-wrap"><div class="con-day-bar-fill' + (r.pct >= 70 ? ' high' : '') + '" style="width:' + r.pct + '%"></div></div>' +
+      '<div style="font-size:10px;color:var(--muted);min-width:36px;text-align:right">' + r.pct + '%</div>' +
+    '</div>'
+  ).join('');
+}
+
+// \u2500\u2500 Mark current hour from anywhere \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500
+window.conMarkCurrentHour = function(){
+  conMarkHour(conToday(), conCurrentHour());
+  conRenderGrid();
+  conRenderHistory();
+};
+
+// \u2500\u2500 Init \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500
+function conInit(){
+  conRenderGrid();
+
+  // History toggle
+  const histBtn   = document.getElementById('con-history-btn');
+  const histPanel = document.getElementById('con-history-panel');
+  if(histBtn && histPanel){
+    histBtn.addEventListener('click', ()=>{
+      histPanel.classList.toggle('open');
+      if(histPanel.classList.contains('open')){
+        histBtn.textContent = '📅 Hide history';
+        conRenderHistory();
+      } else {
+        histBtn.textContent = '📅 Past 30 days';
+      }
+    });
+  }
+
+  // Sync from Firebase once
+  if(typeof fbdb !== 'undefined' && fbdb){
+    fbdb.ref(CON_FB).once('value', snap => {
+      const val = snap.val();
+      if(val && typeof val === 'object'){
+        const local = conLoad();
+        // Merge: Firebase wins for past days, local wins for today
+        const today = conToday();
+        Object.keys(val).forEach(date => {
+          if(date !== today && Array.isArray(val[date])){
+            local[date] = val[date];
+          }
+        });
+        conSave(local);
+        conRenderGrid();
+        conRenderHistory();
+      }
+    });
+  }
+}
+
+// \u2500\u2500 Hook into navTo to refresh grid when glance page is visited \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500
+const _conNavTo = window.navTo;
+const conNavPoll = setInterval(()=>{
+  if(typeof navTo === 'function'){
+    clearInterval(conNavPoll);
+    const _orig = navTo;
+    window.navTo = function(pageId){
+      _orig(pageId);
+      if(pageId === 'glance') { conRenderGrid(); conRenderHistory(); }
+    };
+  }
+}, 200);
+
+// \u2500\u2500 Hook consciousness button in casualness alarm \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500
+// \u2500\u2500 Start once shell is ready \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500
+const conInitPoll = setInterval(()=>{
+  const shell = document.getElementById('shell');
+  if(shell && shell.style.display !== 'none'){
+    clearInterval(conInitPoll);
+    conInit();
+  }
+}, 400);
+
 })();
+
+
+// =============================================================
+// QUICK LEDGER ENTRY (from casualness popup)
+// =============================================================
+function openQuickLedger(){
+  const existing = document.getElementById('qld-overlay');
+  if(existing) existing.remove();
+
+  const today = new Date().toISOString().split('T')[0];
+  const cats  = typeof LD_CATS !== 'undefined' ? LD_CATS : ['Grocery','Bills','Fuel','Education','Medicine','Maintenance','Leisure','Food','Wasted','Others'];
+
+  const overlay = document.createElement('div');
+  overlay.className = 'qld-overlay';
+  overlay.id = 'qld-overlay';
+
+  const catOptions = cats.map(c=>'<option>'+c+'</option>').join('');
+
+  overlay.innerHTML =
+    '<div class="qld-card">'+
+      '<div class="qld-title">&#x1F4B0; Quick Ledger Entry</div>'+
+      '<div class="qld-type-row">'+
+        '<button class="qld-type-btn on" id="qld-type-expense">Expense</button>'+
+        '<button class="qld-type-btn income" id="qld-type-income">Income</button>'+
+      '</div>'+
+      '<input class="qld-inp" type="number" id="qld-amount" placeholder="&#x20B9; Amount" min="0" step="0.01" inputmode="decimal"/>'+
+      '<input class="qld-inp" id="qld-desc" placeholder="Description (optional)"/>'+
+      '<select class="qld-sel" id="qld-cat">'+catOptions+'</select>'+
+      '<input class="qld-inp" id="qld-source" placeholder="Source (e.g. Salary)" style="display:none"/>'+
+      '<div class="qld-mode-row">'+
+        '<button class="qld-mode-btn on" id="qld-mode-upi">&#x1F4F1; UPI</button>'+
+        '<button class="qld-mode-btn" id="qld-mode-cash">&#x1F4B5; Cash</button>'+
+      '</div>'+
+      '<input class="qld-date" type="date" id="qld-date" value="'+today+'"/>'+
+      '<div class="qld-err" id="qld-err"></div>'+
+      '<button class="qld-save-btn" id="qld-save-btn">&#x2713; Save Entry</button>'+
+      '<button class="qld-cancel-btn" id="qld-cancel-btn">Cancel</button>'+
+    '</div>';
+
+  document.body.appendChild(overlay);
+
+  let qldType = 'expense';
+  let qldMode = 'upi';
+
+  document.getElementById('qld-type-expense').addEventListener('click', ()=>{
+    qldType = 'expense';
+    document.getElementById('qld-type-expense').classList.add('on');
+    document.getElementById('qld-type-income').classList.remove('on');
+    document.getElementById('qld-cat').style.display = '';
+    document.getElementById('qld-source').style.display = 'none';
+  });
+  document.getElementById('qld-type-income').addEventListener('click', ()=>{
+    qldType = 'income';
+    document.getElementById('qld-type-income').classList.add('on');
+    document.getElementById('qld-type-expense').classList.remove('on');
+    document.getElementById('qld-cat').style.display = 'none';
+    document.getElementById('qld-source').style.display = '';
+  });
+
+  document.getElementById('qld-mode-upi').addEventListener('click', ()=>{
+    qldMode = 'upi';
+    document.getElementById('qld-mode-upi').classList.add('on');
+    document.getElementById('qld-mode-cash').classList.remove('on');
+  });
+  document.getElementById('qld-mode-cash').addEventListener('click', ()=>{
+    qldMode = 'cash';
+    document.getElementById('qld-mode-cash').classList.add('on');
+    document.getElementById('qld-mode-upi').classList.remove('on');
+  });
+
+  document.getElementById('qld-save-btn').addEventListener('click', ()=>{
+    const amt = parseFloat(document.getElementById('qld-amount').value);
+    const errEl = document.getElementById('qld-err');
+    if(!amt || amt <= 0){ errEl.textContent = 'Please enter a valid amount.'; return; }
+    errEl.textContent = '';
+
+    const txn = {
+      id:       'ld_'+Date.now().toString(36)+Math.random().toString(36).slice(2,5),
+      type:     qldType,
+      amount:   amt,
+      mode:     qldMode === 'upi' ? 'online' : 'cash',
+      source:   qldType === 'income' ? document.getElementById('qld-source').value.trim() : '',
+      category: qldType === 'expense' ? document.getElementById('qld-cat').value : '',
+      desc:     document.getElementById('qld-desc').value.trim(),
+      date:     document.getElementById('qld-date').value || new Date().toISOString().split('T')[0],
+      savedAt:  Date.now()
+    };
+
+    if(typeof LD === 'undefined'){ alert('Ledger not loaded yet.'); return; }
+    ldLoad();
+    LD.transactions.push(txn);
+    ldSave();
+    if(typeof ldBuildMonthSelectors === 'function') ldBuildMonthSelectors();
+    if(typeof ldRenderAll === 'function' && typeof ldInited !== 'undefined' && ldInited) ldRenderAll();
+
+    overlay.remove();
+
+    const toast = document.createElement('div');
+    toast.style.cssText = 'position:fixed;bottom:30px;left:50%;transform:translateX(-50%);background:var(--done);color:#fff;padding:10px 22px;border-radius:10px;font-family:DM Mono,monospace;font-size:12px;z-index:4000;box-shadow:0 4px 16px rgba(0,0,0,.2)';
+    toast.textContent = '\u2714 ' + (qldType==='expense'?'Expense':'Income') + ' \u20B9' + amt.toFixed(0) + ' saved';
+    document.body.appendChild(toast);
+    setTimeout(()=> toast.remove(), 2500);
+  });
+
+  document.getElementById('qld-cancel-btn').addEventListener('click', ()=>{ overlay.remove(); });
+  setTimeout(()=>{ const a = document.getElementById('qld-amount'); if(a) a.focus(); }, 100);
+}
 
 </script>
 </body>
