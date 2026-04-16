@@ -1527,6 +1527,74 @@ tr:last-child td{border-bottom:none}
   .rem-item-title{font-size:12px}
 }
 
+/* ══════════════════════════════════════════════════
+   PRAJALPA PENALTY POPUP
+══════════════════════════════════════════════════ */
+.prajalpa-bill-btn{
+  display:inline-flex;align-items:center;justify-content:center;
+  margin-left:8px;width:22px;height:22px;border-radius:6px;
+  background:rgba(224,90,43,.12);border:1.5px solid rgba(224,90,43,.3);
+  color:var(--acc);font-size:11px;font-family:'Syne',sans-serif;font-weight:800;
+  cursor:pointer;transition:all .13s;vertical-align:middle;flex-shrink:0;
+  line-height:1;padding:0;
+}
+.prajalpa-bill-btn:hover{background:var(--acc);color:#fff;border-color:var(--acc)}
+
+.praj-overlay{
+  position:fixed;inset:0;background:rgba(58,36,24,.55);z-index:3000;
+  display:flex;align-items:center;justify-content:center;padding:20px;
+}
+.praj-card{
+  background:var(--sur);border:2px solid var(--bdr);border-radius:18px;
+  width:100%;max-width:420px;max-height:88vh;display:flex;flex-direction:column;
+  box-shadow:0 12px 40px rgba(58,36,24,.2);overflow:hidden;
+}
+.praj-header{
+  padding:16px 18px 12px;border-bottom:1.5px solid var(--bdr);
+  display:flex;align-items:center;gap:10px;flex-shrink:0;
+  background:var(--sur2);
+}
+.praj-header-icon{font-size:22px}
+.praj-header-info{flex:1}
+.praj-title{font-family:'Syne',sans-serif;font-size:15px;font-weight:800;color:var(--txt)}
+.praj-subtitle{font-size:10px;color:var(--muted);margin-top:2px}
+.praj-close{background:none;border:1.5px solid var(--bdr);border-radius:7px;padding:4px 9px;font-family:'DM Mono',monospace;font-size:11px;color:var(--muted);cursor:pointer;flex-shrink:0}
+.praj-close:hover{border-color:var(--bad);color:var(--bad)}
+
+.praj-summary{
+  padding:14px 18px;border-bottom:1.5px solid var(--bdr);
+  display:flex;align-items:center;gap:14px;flex-shrink:0;
+}
+.praj-pending-amount{font-family:'Syne',sans-serif;font-size:26px;font-weight:800;color:var(--bad)}
+.praj-pending-amount.zero{color:var(--done)}
+.praj-pending-label{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin-top:2px}
+.praj-donate-btn{
+  margin-left:auto;background:var(--done);color:#fff;border:none;border-radius:10px;
+  padding:9px 16px;font-family:'Syne',sans-serif;font-size:12px;font-weight:700;
+  cursor:pointer;transition:opacity .15s;white-space:nowrap;
+}
+.praj-donate-btn:hover{opacity:.86}
+.praj-donate-btn:disabled{background:var(--bdr);color:var(--muted);cursor:default;opacity:1}
+
+.praj-log{flex:1;overflow-y:auto;padding:12px 18px 16px}
+.praj-log-title{font-family:'DM Mono',monospace;font-size:10px;color:var(--muted);letter-spacing:1px;text-transform:uppercase;margin-bottom:10px}
+.praj-log-empty{text-align:center;padding:32px 0;color:var(--done);font-size:12px}
+.praj-day-row{
+  display:flex;align-items:center;gap:10px;padding:9px 12px;
+  border-radius:9px;border:1.5px solid var(--bdr);margin-bottom:6px;
+  background:var(--bg);
+}
+.praj-day-row.cleared{border-color:var(--done);background:rgba(46,125,94,.05)}
+.praj-day-row.pending{border-color:rgba(192,57,43,.35);background:rgba(192,57,43,.04)}
+.praj-day-date{font-family:'DM Mono',monospace;font-size:11px;color:var(--txt);flex:1}
+.praj-day-reason{font-size:9px;color:var(--muted);margin-top:1px}
+.praj-day-amt{font-family:'Syne',sans-serif;font-size:13px;font-weight:800;flex-shrink:0}
+.praj-day-row.pending .praj-day-amt{color:var(--bad)}
+.praj-day-row.cleared .praj-day-amt{color:var(--done)}
+.praj-day-badge{font-size:9px;border-radius:12px;padding:2px 8px;font-weight:700;flex-shrink:0}
+.praj-day-badge.pending{background:rgba(192,57,43,.1);color:var(--bad)}
+.praj-day-badge.cleared{background:rgba(46,125,94,.12);color:var(--done)}
+
 </style>
 </head>
 <body>
@@ -4182,6 +4250,13 @@ function sMakeCard(tid,p){
   const card=document.createElement('div'); card.className='pc'; card.id='card_'+tid+'_'+p.id;
   const ph=document.createElement('div'); ph.className='ph';
   const lbl=document.createElement('div'); lbl.className='plbl'; lbl.textContent=p.lbl;
+  if(tid==='key' && p.id==='spkls'){
+    const prajBtn=document.createElement('button');
+    prajBtn.className='prajalpa-bill-btn'; prajBtn.textContent='\u20b9';
+    prajBtn.title='Prajalpa Penalty Fund';
+    prajBtn.addEventListener('click',e=>{ e.stopPropagation(); openPrajalpaPopup(); });
+    lbl.appendChild(prajBtn);
+  }
   const ctrl=document.createElement('div'); ctrl.className='pctrl'; ctrl.dataset.tid=tid; ctrl.dataset.pid=p.id;
   sBuildCtrl(ctrl,tid,p); ph.appendChild(lbl); ph.appendChild(ctrl); card.appendChild(ph);
   if(p.type==='felt'||p.type.startsWith('cknote:')){
@@ -4424,7 +4499,7 @@ let wkOffset = 0;
 let activeCat = null;
 
 function tmLoad(){ try{ const d=localStorage.getItem(TM_LS); TM=d?JSON.parse(d):{categories:[],todos:[],slots:{}}; }catch(e){ TM={categories:[],todos:[],slots:{}}; } if(!TM.categories) TM.categories=[]; if(!TM.todos) TM.todos=[]; if(!TM.slots) TM.slots={}; }
-function tmSave(){ try{ localStorage.setItem(TM_LS,JSON.stringify(TM)); }catch(e){} if(fbdb) fbdb.ref('timemanagement').set(TM).catch(()=>{}); }
+function tmSave(){ try{ localStorage.setItem(TM_LS,JSON.stringify(TM)); }catch(e){} if(fbdb) fbdb.ref('timemanagement').set(TM).catch(()=>{}); setTimeout(syncPlannerReminders, 300); }
 function tmUID(){ return 'tm'+Date.now().toString(36)+Math.random().toString(36).slice(2,5); }
 function tmDateStr(d){ var y=d.getFullYear(),m=d.getMonth()+1,dd=d.getDate(); return y+'-'+(m<10?'0'+m:m)+'-'+(dd<10?'0'+dd:dd); }
 function tmSlotKey(date,hour){ return tmDateStr(date)+'|'+String(hour).padStart(2,'0'); }
@@ -4538,6 +4613,7 @@ function syncTMFromFB(){
       if(r.slots){ Object.keys(r.slots).forEach(function(k){ if(!TM.slots[k]) TM.slots[k]=r.slots[k]; }); }
       tmSave();
       if(tmInited){ tmRenderCategories(); tmRenderTodos(); tmRenderPlannerTodos(); }
+      setTimeout(syncPlannerReminders, 800);
     }
     fbdb.ref('timemanagement').on('value', function(snap2){
       var r2=snap2.val();
@@ -9339,9 +9415,43 @@ function remSaveForm(){
 }
 
 // ── Sync reminders list to Firebase so Cloud Function can read them ──
+// ── Planner slot reminders ────────────────────────────────────
+function getPlannerRemindersForToday(){
+  if(typeof TM === 'undefined' || !TM.slots) return [];
+  var today = (typeof tmDateStr === 'function') ? tmDateStr(new Date()) : new Date().toISOString().split('T')[0];
+  var rems = [];
+  for(var h = 1; h < 24; h++){  // skip hour 0 (midnight edge case)
+    var key = today + '|' + String(h).padStart(2,'0');
+    var items = Array.isArray(TM.slots[key]) ? TM.slots[key] : [];
+    if(items.length === 0) continue;
+    var remH = h - 1;
+    var timeStr = String(remH).padStart(2,'0') + ':30';
+    var taskNames = items.map(function(si){ return si.text || ''; }).filter(Boolean).join(', ');
+    rems.push({
+      id: 'planner_' + today + '_' + String(h).padStart(2,'0'),
+      title: '⏰ ' + String(h).padStart(2,'0') + ':00 slot starting soon',
+      time: timeStr,
+      repeat: 'once',
+      note: taskNames ? (taskNames.length > 80 ? taskNames.slice(0,77)+'...' : taskNames) : '',
+      active: true,
+      isPlanner: true,
+      createdAt: Date.now()
+    });
+  }
+  return rems;
+}
+
+function syncPlannerReminders(){
+  if(!fbdb || typeof TM === 'undefined') return;
+  var userRems = (typeof remLoad === 'function') ? remLoad() : [];
+  var plannerRems = getPlannerRemindersForToday();
+  fbdb.ref('reminders').set(userRems.concat(plannerRems));
+}
+
 function syncRemindersToFB(items){
   if(!fbdb) return;
-  fbdb.ref('reminders').set(items);
+  var plannerRems = (typeof getPlannerRemindersForToday === 'function' && typeof TM !== 'undefined') ? getPlannerRemindersForToday() : [];
+  fbdb.ref('reminders').set(items.concat(plannerRems));
 }
 
 // ── Init the page ────────────────────────────────
@@ -9365,7 +9475,8 @@ function initReminders(){
     fbdb.ref('reminders').once('value', snap=>{
       const val = snap.val();
       if(Array.isArray(val) && val.length){
-        remSave(val);
+        const userOnly = val.filter(r => !r.isPlanner);
+        remSave(userOnly);
         remRender();
       }
     });
@@ -9720,6 +9831,190 @@ function openQuickLedger(){
   document.getElementById('qld-cancel-btn').addEventListener('click', ()=>{ overlay.remove(); });
   setTimeout(()=>{ const a = document.getElementById('qld-amount'); if(a) a.focus(); }, 100);
 }
+
+// =============================================================
+// PRAJALPA PENALTY FUND
+// =============================================================
+(function(){
+  const PRAJ_FB = 'prajalpa_donations';
+  const PRAJ_LS = 'prajalpa_donations_cache';
+
+  function prajToday(){
+    const d=new Date(); return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
+  }
+  function prajYesterday(){
+    const d=new Date(); d.setDate(d.getDate()-1);
+    return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
+  }
+  function prajDateLabel(ds){
+    const d=new Date(ds+'T00:00:00');
+    return d.toLocaleDateString('en-IN',{day:'numeric',month:'short',year:'numeric'});
+  }
+  function prajAddDays(ds, n){
+    const d=new Date(ds+'T00:00:00'); d.setDate(d.getDate()+n);
+    return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
+  }
+
+  // Load donations from localStorage cache
+  function prajLoadCache(){
+    try{ return JSON.parse(localStorage.getItem(PRAJ_LS)||'{}'); }catch{ return {}; }
+  }
+  function prajSaveCache(data){
+    try{ localStorage.setItem(PRAJ_LS, JSON.stringify(data)); }catch{}
+  }
+
+  // Build set of cleared days from donations map
+  function prajClearedSet(donations){
+    const s=new Set();
+    Object.values(donations||{}).forEach(d=>{
+      if(d && d.days) Object.keys(d.days).forEach(day=>s.add(day));
+    });
+    return s;
+  }
+
+  // Compute penalty days: from 90 days ago up to yesterday
+  // Penalise if speak less != 'y' (including null/unanswered)
+  // Only from earliest date that has ANY sadhana data — never before app usage started
+  function prajGetEarliestSadhanaDate(){
+    if(typeof S_DATA === 'undefined') return null;
+    let earliest = null;
+    Object.values(S_DATA).forEach(dateMap=>{
+      if(typeof dateMap !== 'object') return;
+      Object.keys(dateMap).forEach(d=>{
+        if(/^\d{4}-\d{2}-\d{2}$/.test(d)){
+          if(!earliest || d < earliest) earliest = d;
+        }
+      });
+    });
+    return earliest;
+  }
+
+  function prajGetPenaltyDays(){
+    const yesterday = prajYesterday();
+    const earliest  = prajGetEarliestSadhanaDate();
+    if(!earliest) return [];
+    const start = earliest > prajAddDays(prajToday(), -90) ? earliest : prajAddDays(prajToday(), -90);
+    const days = [];
+    let cur = start;
+    while(cur <= yesterday){
+      const val = (typeof S_DATA !== 'undefined') ? ((S_DATA['key__spkls']||{})[cur] ?? null) : null;
+      const reason = val === 'n' ? 'Prajalpa done' : 'Not recorded';
+      if(val !== 'y') days.push({ date: cur, reason });
+      cur = prajAddDays(cur, 1);
+    }
+    return days.reverse(); // newest first
+  }
+
+  window.openPrajalpaPopup = function(){
+    const existing = document.getElementById('praj-overlay');
+    if(existing) existing.remove();
+
+    const donations = prajLoadCache();
+    renderPopup(donations);
+
+    // Also fetch fresh from Firebase
+    if(typeof fbdb !== 'undefined' && fbdb){
+      fbdb.ref(PRAJ_FB).once('value', snap=>{
+        const val = snap.val();
+        if(val && typeof val === 'object'){
+          prajSaveCache(val);
+          const ov = document.getElementById('praj-overlay');
+          if(ov) renderPopup(val); // re-render with fresh data
+        }
+      });
+    }
+  };
+
+  function renderPopup(donations){
+    const existing = document.getElementById('praj-overlay');
+    if(existing) existing.remove();
+
+    const clearedSet  = prajClearedSet(donations);
+    const penaltyDays = prajGetPenaltyDays();
+    const pendingDays = penaltyDays.filter(d => !clearedSet.has(d.date));
+    const totalPending = pendingDays.length * 100;
+
+    const overlay = document.createElement('div');
+    overlay.className = 'praj-overlay'; overlay.id = 'praj-overlay';
+
+    // Build log rows HTML
+    let logHTML = '';
+    if(penaltyDays.length === 0){
+      logHTML = '<div class="praj-log-empty">\u2714 No penalty days found in last 90 days</div>';
+    } else {
+      penaltyDays.forEach(d=>{
+        const isCleared = clearedSet.has(d.date);
+        logHTML += '<div class="praj-day-row '+(isCleared?'cleared':'pending')+'">'
+          +'<div><div class="praj-day-date">'+prajDateLabel(d.date)+'</div>'
+          +'<div class="praj-day-reason">'+d.reason+'</div></div>'
+          +'<div class="praj-day-amt">\u20b9100</div>'
+          +'<span class="praj-day-badge '+(isCleared?'cleared':'pending')+'">'+(isCleared?'Donated':'Pending')+'</span>'
+          +'</div>';
+      });
+    }
+
+    overlay.innerHTML =
+      '<div class="praj-card">'
+        +'<div class="praj-header">'
+          +'<div class="praj-header-icon">\ud83d\udcb8</div>'
+          +'<div class="praj-header-info">'
+            +'<div class="praj-title">Prajalpa Penalty Fund</div>'
+            +'<div class="praj-subtitle">\u20b9100 per day of prajalpa \u00b7 locked at midnight</div>'
+          +'</div>'
+          +'<button class="praj-close" id="praj-close-btn">\u2715 Close</button>'
+        +'</div>'
+        +'<div class="praj-summary">'
+          +'<div>'
+            +'<div class="praj-pending-amount'+(totalPending===0?' zero':'')+'">\u20b9'+totalPending+'</div>'
+            +'<div class="praj-pending-label">Total pending</div>'
+          +'</div>'
+          +'<button class="praj-donate-btn" id="praj-donate-btn"'+(pendingDays.length===0?' disabled':'')+'>\ud83d\ude4f Donate &amp; Clear</button>'
+        +'</div>'
+        +'<div class="praj-log">'
+          +'<div class="praj-log-title">Penalty Log \u2014 Last 90 Days</div>'
+          +logHTML
+        +'</div>'
+      +'</div>';
+
+    document.body.appendChild(overlay);
+
+    document.getElementById('praj-close-btn').addEventListener('click', ()=> overlay.remove());
+    overlay.addEventListener('click', e=>{ if(e.target===overlay) overlay.remove(); });
+
+    const donateBtn = document.getElementById('praj-donate-btn');
+    if(donateBtn && pendingDays.length > 0){
+      donateBtn.addEventListener('click', ()=>{
+        donateBtn.disabled = true; donateBtn.textContent = 'Saving…';
+        const days = {};
+        pendingDays.forEach(d=> days[d.date] = true);
+        const record = { ts: Date.now(), amount: totalPending, days };
+
+        if(typeof fbdb !== 'undefined' && fbdb){
+          fbdb.ref(PRAJ_FB).push(record).then(ref=>{
+            const updated = prajLoadCache();
+            updated[ref.key] = record;
+            prajSaveCache(updated);
+            renderPopup(updated);
+          }).catch(()=>{
+            // fallback: save locally with temp key
+            const key = 'local_'+Date.now();
+            const updated = prajLoadCache();
+            updated[key] = record;
+            prajSaveCache(updated);
+            renderPopup(updated);
+          });
+        } else {
+          const key = 'local_'+Date.now();
+          const updated = prajLoadCache();
+          updated[key] = record;
+          prajSaveCache(updated);
+          renderPopup(updated);
+        }
+      });
+    }
+  }
+})();
+
 
 </script>
 </body>
