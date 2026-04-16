@@ -3794,7 +3794,7 @@ function lkIsLacking(type, val, threshold){
   if(type==='tap') return val==='none'; // Only flag if no tapasya at all
   if(type==='num') return typeof val==='number' && val < (threshold||1);
   if(type==='felt') return (typeof val==='object'?val.status:val)==='felt';
-  if(type.startsWith('chk2:')){ if(!val||typeof val!=='object') return true; const names=type.split(':').slice(1); return names.every(n=>!val[n]); }
+  if(type.startsWith('chk2:')){ if(!val||typeof val!=='object') return true; if(val.none) return false; const names=type.split(':').slice(1); return names.every(n=>!val[n]); }
   return false;
 }
 
@@ -4352,7 +4352,14 @@ function sBuildCtrl(container,tid,p){
   else if(t.startsWith('chk2:')){
     const[,n1,n2]=t.split(':'); const svObj=(sv&&typeof sv==='object')?sv:{};
     const grp=document.createElement('div'); grp.className='chkgrp';
-    [n1,n2].forEach(name=>{ const lbl=document.createElement('label'); lbl.className='chkitem'; const cb=document.createElement('input'); cb.type='checkbox'; cb.checked=!!svObj[name]; cb.addEventListener('change',()=>{ const cur=(sGetV(tid,p.id,td)&&typeof sGetV(tid,p.id,td)==='object')?{...sGetV(tid,p.id,td)}:{}; cur[name]=cb.checked; sSetV(tid,p.id,td,cur); }); lbl.appendChild(cb); lbl.appendChild(document.createTextNode(name)); grp.appendChild(lbl); });
+    [n1,n2].forEach(name=>{ const lbl=document.createElement('label'); lbl.className='chkitem'; const cb=document.createElement('input'); cb.type='checkbox'; cb.checked=!!svObj[name]; cb.addEventListener('change',()=>{ const cur=(sGetV(tid,p.id,td)&&typeof sGetV(tid,p.id,td)==='object')?{...sGetV(tid,p.id,td)}:{}; delete cur.none; cur[name]=cb.checked; sSetV(tid,p.id,td,cur); }); lbl.appendChild(cb); lbl.appendChild(document.createTextNode(name)); grp.appendChild(lbl); });
+    // None button
+    const bothBtn=document.createElement('button'); const allChecked=!svObj.none&&[n1,n2].every(n=>!!svObj[n]); bothBtn.className='btn by'+(allChecked?' on':''); bothBtn.textContent='Both';
+    bothBtn.onclick=()=>{ sSetV(tid,p.id,td,{[n1]:true,[n2]:true}); sRebuildCtrl(tid,p.id); };
+    grp.appendChild(bothBtn);
+    const noneBtn2=document.createElement('button'); noneBtn2.className='btn bm'+(svObj.none?' on':''); noneBtn2.textContent='None';
+    noneBtn2.onclick=()=>{ sSetV(tid,p.id,td,{none:true}); sRebuildCtrl(tid,p.id); };
+    grp.appendChild(noneBtn2);
     container.appendChild(grp);
   }
   else if(t.startsWith('cknote:')){
@@ -4373,7 +4380,7 @@ function sRebuildCtrl(tid,pid){
 
 function sFmtVal(v,type){
   if(v===null||v===undefined) return{txt:'—',cls:''};
-  if(type.startsWith('chk2:')){const[,n1,n2]=type.split(':');if(typeof v!=='object')return{txt:'—',cls:''};const done=[n1,n2].filter(n=>v[n]);return{txt:done.length?done.join(', '):'—',cls:done.length?'chy':'chn'};}
+  if(type.startsWith('chk2:')){const[,n1,n2]=type.split(':');if(typeof v!=='object')return{txt:'—',cls:''};if(v.none)return{txt:'None',cls:'chn'};const done=[n1,n2].filter(n=>v[n]);return{txt:done.length?done.join(', '):'—',cls:done.length?'chy':'chn'};}
   if(typeof v==='object'){const status=v.status||'observed';const note=v.note?' | '+v.note:'';const cls=status==='felt'||status==='observed'?'cho':'chy';return{txt:status+note,cls};}
   const map={y:'Followed',n:'Not Followed',full:'Full Tapasya',some:'Some Tapasya',none:'No Tapasya',felt:'Felt',notfelt:'Not Felt',noreply:'No Reply'};
   const txt=map[v]!==undefined?map[v]:String(v);const cls=['y','full'].includes(v)?'chy':['n','none','notfelt'].includes(v)?'chn':'cho';return{txt,cls};
@@ -8560,7 +8567,7 @@ function isFilled(p, val){
   if(p.type === 'felt') return (typeof val === 'object' ? val.status : val) === 'felt' || (typeof val === 'object' ? val.status : val) === 'notfelt';
   if(p.type.startsWith('num:')) return typeof val === 'number';
   if(p.type === 'tap') return val !== null && val !== undefined;
-  if(p.type.startsWith('chk2:')) return typeof val === 'object' && val !== null;
+  if(p.type.startsWith('chk2:')) return typeof val === 'object' && val !== null && (val.none || Object.values(val).some(Boolean));
   return false;
 }
 
@@ -8972,12 +8979,23 @@ function buildDCIButtons(container, p, rKey, existingVal){
       b.className = 'dci-btn' + (curObj[name] ? ' sel-y' : '');
       b.textContent = name;
       b.onclick = ()=>{
-        const prev = dciResponses[rKey] || {};
-        dciResponses[rKey] = {...prev, [name]: !prev[name]};
+        const prev = (dciResponses[rKey] && typeof dciResponses[rKey]==='object') ? {...dciResponses[rKey]} : {};
+        delete prev.none;
+        prev[name] = !prev[name];
+        dciResponses[rKey] = prev;
         refreshDCIItem(container, p, rKey);
       };
       container.appendChild(b);
     });
+    // None button
+    const noneBtn = document.createElement('button');
+    noneBtn.className = 'dci-btn' + (curObj.none ? ' sel-na' : '');
+    noneBtn.textContent = 'None';
+    noneBtn.onclick = ()=>{
+      dciResponses[rKey] = { none: true };
+      refreshDCIItem(container, p, rKey);
+    };
+    container.appendChild(noneBtn);
   }
 }
 
