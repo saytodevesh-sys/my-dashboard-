@@ -2612,6 +2612,7 @@ tr:last-child td{border-bottom:none}
                 <option value="Leisure">🎉 Leisure</option>
                 <option value="Food">🍛 Food</option>
                 <option value="Wasted">🗑 Wasted</option>
+                <option value="Service/Donation">🙏 Service/Donation</option>
                 <option value="Others">📦 Others</option>
               </select>
             </div>
@@ -7216,8 +7217,8 @@ let ldPieChart=null; let ldTrendChart=null;
 function ldLoad(){ try{ LD=JSON.parse(localStorage.getItem(LD_LS)||'null')||{transactions:[]}; }catch{ LD={transactions:[]}; } }
 function ldSave(){ try{ localStorage.setItem(LD_LS,JSON.stringify(LD)); }catch{} if(fbdb) fbdb.ref('ledger').set(LD).catch(()=>{}); }
 function ldUID(){ return 'ld_'+Date.now().toString(36)+Math.random().toString(36).slice(2,5); }
-const LD_CATS=['Grocery','Bills','Fuel','Education','Medicine','Maintenance','Leisure','Food','Wasted','Others'];
-const LD_CAT_COLORS=['#e05a2b','#c0392b','#8b5e3c','#d4845a','#2e7d5e','#5b8c5a','#9b59b6','#e67e22','#a07060','#3498db'];
+const LD_CATS=['Grocery','Bills','Fuel','Education','Medicine','Maintenance','Leisure','Food','Wasted','Service/Donation','Others'];
+const LD_CAT_COLORS=['#e05a2b','#c0392b','#8b5e3c','#d4845a','#2e7d5e','#5b8c5a','#9b59b6','#e67e22','#a07060','#16a085','#3498db'];
 
 function initLedger(){
   ldLoad(); ldInited=true;
@@ -7283,7 +7284,7 @@ function ldRenderTxnList(){
   txns.forEach(t=>{
     const row=document.createElement('div'); row.className='ld-txn-row';
     const isInc=t.type==='income';
-    const catEmojis={Grocery:'🛒',Bills:'💡',Fuel:'⛽',Education:'📚',Medicine:'💊',Maintenance:'🔧',Leisure:'🎉',Food:'🍛',Wasted:'🗑',Others:'📦'};
+    const catEmojis={Grocery:'🛒',Bills:'💡',Fuel:'⛽',Education:'📚',Medicine:'💊',Maintenance:'🔧',Leisure:'🎉',Food:'🍛',Wasted:'🗑','Service/Donation':'🙏',Others:'📦'};
     const icon=isInc?'💰':(catEmojis[t.category]||'💸');
     const confirmId='lddel_'+t.id;
     row.innerHTML=
@@ -9734,7 +9735,7 @@ function openQuickLedger(){
   if(existing) existing.remove();
 
   const today = new Date().toISOString().split('T')[0];
-  const cats  = typeof LD_CATS !== 'undefined' ? LD_CATS : ['Grocery','Bills','Fuel','Education','Medicine','Maintenance','Leisure','Food','Wasted','Others'];
+  const cats  = typeof LD_CATS !== 'undefined' ? LD_CATS : ['Grocery','Bills','Fuel','Education','Medicine','Maintenance','Leisure','Food','Wasted','Service/Donation','Others'];
 
   const overlay = document.createElement('div');
   overlay.className = 'qld-overlay';
